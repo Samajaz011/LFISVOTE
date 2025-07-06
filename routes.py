@@ -576,6 +576,48 @@ def voting_control(action):
     
     return redirect(url_for('admin'))
 
+@app.route('/admin/system/credentials', methods=['GET', 'POST'])
+def admin_credentials():
+    """Hidden admin credentials management portal"""
+    if request.method == 'POST':
+        current_username = request.form.get('current_username')
+        current_password = request.form.get('current_password')
+        new_username = request.form.get('new_username')
+        new_password = request.form.get('new_password')
+        confirm_password = request.form.get('confirm_password')
+        
+        # Validate current credentials
+        admin = Admin.query.filter_by(username=current_username).first()
+        if not admin or not admin.check_password(current_password):
+            flash('Invalid current credentials', 'error')
+            return render_template('admin_credentials.html')
+        
+        # Validate new password
+        if new_password != confirm_password:
+            flash('New passwords do not match', 'error')
+            return render_template('admin_credentials.html')
+        
+        if len(new_password) < 6:
+            flash('New password must be at least 6 characters long', 'error')
+            return render_template('admin_credentials.html')
+        
+        try:
+            # Update credentials
+            admin.username = new_username
+            admin.set_password(new_password)
+            db.session.commit()
+            
+            flash('Admin credentials updated successfully!', 'success')
+            app.logger.info(f"Admin credentials updated - new username: {new_username}")
+            return render_template('admin_credentials.html', success=True)
+            
+        except Exception as e:
+            db.session.rollback()
+            flash('Error updating credentials. Please try again.', 'error')
+            app.logger.error(f"Credentials update error: {str(e)}")
+    
+    return render_template('admin_credentials.html')
+
 # Initialize default admin if none exists
 def create_default_admin():
     """Create default admin user if none exists"""

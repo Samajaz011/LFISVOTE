@@ -1,0 +1,418 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Little Flower International School Elections{% endblock %}
+
+{% block content %}
+<!-- Admin Header -->
+<section class="bg-primary text-white py-4">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-6 fw-bold mb-2">
+                    <i class="fas fa-tachometer-alt me-3"></i>
+                    Admin Dashboard
+                </h1>
+                <p class="lead mb-0">Election Management & Results Overview</p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <a href="{{ url_for('export_results') }}" class="btn btn-light btn-lg">
+                    <i class="fas fa-file-excel me-2"></i>
+                    Export Results
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Statistics Cards -->
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4 mb-5">
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card bg-primary text-white">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 class="stat-number">{{ total_students }}</h3>
+                        <p class="stat-label">Total Students</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card bg-success text-white">
+                    <div class="stat-icon">
+                        <i class="fas fa-vote-yea"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 class="stat-number">{{ total_votes }}</h3>
+                        <p class="stat-label">Total Votes</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card bg-warning text-white">
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 class="stat-number">{{ voted_students }}</h3>
+                        <p class="stat-label">Students Voted</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card bg-info text-white">
+                    <div class="stat-icon">
+                        <i class="fas fa-percentage"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 class="stat-number">
+                            {% if total_students > 0 %}
+                                {{ "%.1f"|format((voted_students / total_students) * 100) }}%
+                            {% else %}
+                                0%
+                            {% endif %}
+                        </h3>
+                        <p class="stat-label">Turnout</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Overview -->
+        <div class="row g-4">
+            <!-- Head Boy Results -->
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="card-title mb-0">
+                            <i class="fas fa-user-tie me-2"></i>
+                            Head Boy Results
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        {% if head_boy_results %}
+                            {% for result in head_boy_results %}
+                            <div class="candidate-result mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div>
+                                        <h5 class="fw-bold mb-1">{{ result.candidate.name }}</h5>
+                                        <small class="text-muted">{{ result.candidate.class_name }}</small>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge bg-primary fs-6">{{ result.votes }} votes</span>
+                                    </div>
+                                </div>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar bg-primary" 
+                                         style="width: {% if total_votes > 0 %}{{ (result.votes / (total_votes // 2)) * 100 }}%{% else %}0%{% endif %}">
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-muted text-center py-3">
+                                <i class="fas fa-inbox me-2"></i>
+                                No votes recorded yet
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Head Girl Results -->
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-success text-white">
+                        <h4 class="card-title mb-0">
+                            <i class="fas fa-female me-2"></i>
+                            Head Girl Results
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        {% if head_girl_results %}
+                            {% for result in head_girl_results %}
+                            <div class="candidate-result mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div>
+                                        <h5 class="fw-bold mb-1">{{ result.candidate.name }}</h5>
+                                        <small class="text-muted">{{ result.candidate.class_name }}</small>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge bg-success fs-6">{{ result.votes }} votes</span>
+                                    </div>
+                                </div>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar bg-success" 
+                                         style="width: {% if total_votes > 0 %}{{ (result.votes / (total_votes // 2)) * 100 }}%{% else %}0%{% endif %}">
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-muted text-center py-3">
+                                <i class="fas fa-inbox me-2"></i>
+                                No votes recorded yet
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Voting Progress Visualization -->
+        <div class="row mt-5 mb-5">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-gradient-primary text-white">
+                        <h4 class="card-title mb-0">
+                            <i class="fas fa-chart-line me-2"></i>
+                            Live Voting Progress
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-4">
+                            <!-- Turnout Progress -->
+                            <div class="col-lg-6">
+                                <div class="progress-section">
+                                    <h5 class="mb-3">
+                                        <i class="fas fa-users me-2 text-primary"></i>
+                                        Voter Turnout
+                                    </h5>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>{{ voted_students }} out of {{ total_students }} students</span>
+                                        <span class="fw-bold">
+                                            {% if total_students > 0 %}
+                                                {{ "%.1f"|format((voted_students / total_students) * 100) }}%
+                                            {% else %}
+                                                0%
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="progress mb-3" style="height: 15px;">
+                                        <div class="progress-bar bg-primary progress-bar-striped progress-bar-animated" 
+                                             style="width: {% if total_students > 0 %}{{ (voted_students / total_students) * 100 }}%{% else %}0%{% endif %}">
+                                        </div>
+                                    </div>
+                                    <div class="progress-milestones">
+                                        <div class="milestone {% if total_students > 0 and (voted_students / total_students) >= 0.25 %}achieved{% endif %}">
+                                            <span class="milestone-label">25%</span>
+                                        </div>
+                                        <div class="milestone {% if total_students > 0 and (voted_students / total_students) >= 0.50 %}achieved{% endif %}">
+                                            <span class="milestone-label">50%</span>
+                                        </div>
+                                        <div class="milestone {% if total_students > 0 and (voted_students / total_students) >= 0.75 %}achieved{% endif %}">
+                                            <span class="milestone-label">75%</span>
+                                        </div>
+                                        <div class="milestone {% if total_students > 0 and (voted_students / total_students) >= 1.0 %}achieved{% endif %}">
+                                            <span class="milestone-label">100%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Live Chart -->
+                            <div class="col-lg-6">
+                                <div class="chart-section">
+                                    <h5 class="mb-3">
+                                        <i class="fas fa-chart-pie me-2 text-success"></i>
+                                        Vote Distribution
+                                    </h5>
+                                    <canvas id="liveVotingChart" width="400" height="200"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Real-time Stats -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="alert alert-info d-flex align-items-center">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <div>
+                                        <strong>Last Updated:</strong> <span id="lastUpdateTime">Just now</span>
+                                        <button class="btn btn-sm btn-outline-primary ms-3" onclick="refreshVotingData()">
+                                            <i class="fas fa-sync-alt me-1"></i>
+                                            Refresh Data
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Voting Control -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="card-title mb-0">
+                            <i class="fas fa-cogs me-2"></i>
+                            Voting Control Center
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-lg-6">
+                                <h5 class="mb-3">Current Voting Status</h5>
+                                <div class="status-display">
+                                    {% if current_voting_active %}
+                                        <span class="badge bg-success fs-6 px-3 py-2 mb-2">
+                                            <i class="fas fa-circle me-1"></i>
+                                            VOTING ACTIVE
+                                        </span>
+                                        <p class="text-muted mb-0">Students can currently cast votes</p>
+                                        
+                                        {% if voting_session and voting_session.admin_override %}
+                                            <div class="alert alert-info mt-2 mb-0">
+                                                <i class="fas fa-user-shield me-2"></i>
+                                                <strong>Admin Override:</strong> Voting manually opened
+                                            </div>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="badge bg-warning fs-6 px-3 py-2 mb-2">
+                                            <i class="fas fa-clock me-1"></i>
+                                            VOTING INACTIVE
+                                        </span>
+                                        <p class="text-muted mb-0">Voting is currently closed</p>
+                                        
+                                        {% if voting_session and voting_session.admin_override %}
+                                            <div class="alert alert-warning mt-2 mb-0">
+                                                <i class="fas fa-user-shield me-2"></i>
+                                                <strong>Admin Override:</strong> 
+                                                {% if voting_session.override_status == 'force_closed' %}
+                                                    Voting manually closed
+                                                {% else %}
+                                                    Following scheduled time
+                                                {% endif %}
+                                            </div>
+                                        {% else %}
+                                            <div class="alert alert-info mt-2 mb-0">
+                                                <i class="fas fa-calendar me-2"></i>
+                                                <strong>Scheduled:</strong> July 7, 2025, 9:00 AM - 2:00 PM
+                                            </div>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <h5 class="mb-3">Manual Controls</h5>
+                                <div class="d-grid gap-2">
+                                    {% if not current_voting_active %}
+                                        <form method="POST" action="{{ url_for('voting_control', action='force_open') }}" class="d-inline">
+                                            <button type="submit" class="btn btn-success w-100" onclick="return confirm('This will immediately open voting for all students. Continue?')">
+                                                <i class="fas fa-play me-2"></i>
+                                                Force Open Voting
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <form method="POST" action="{{ url_for('voting_control', action='force_close') }}" class="d-inline">
+                                            <button type="submit" class="btn btn-danger w-100" onclick="return confirm('This will immediately close voting. No more votes will be accepted. Continue?')">
+                                                <i class="fas fa-stop me-2"></i>
+                                                Force Close Voting
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                    
+                                    {% if voting_session and voting_session.admin_override %}
+                                        <form method="POST" action="{{ url_for('voting_control', action='reset_schedule') }}" class="d-inline">
+                                            <button type="submit" class="btn btn-outline-primary w-100">
+                                                <i class="fas fa-calendar-alt me-2"></i>
+                                                Return to Scheduled Time
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-light">
+                        <h4 class="card-title mb-0">
+                            <i class="fas fa-tools me-2"></i>
+                            Quick Actions
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <a href="{{ url_for('admin_candidates') }}" class="btn btn-outline-primary w-100 py-3">
+                                    <i class="fas fa-users-cog d-block mb-2" style="font-size: 1.5rem;"></i>
+                                    Manage Candidates
+                                </a>
+                            </div>
+                            <div class="col-md-3">
+                                <a href="{{ url_for('admin_students') }}" class="btn btn-outline-success w-100 py-3">
+                                    <i class="fas fa-user-graduate d-block mb-2" style="font-size: 1.5rem;"></i>
+                                    Manage Students
+                                </a>
+                            </div>
+                            <div class="col-md-3">
+                                <a href="{{ url_for('admin_results') }}" class="btn btn-outline-info w-100 py-3">
+                                    <i class="fas fa-chart-bar d-block mb-2" style="font-size: 1.5rem;"></i>
+                                    View Results
+                                </a>
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn-outline-danger w-100 py-3" data-bs-toggle="modal" data-bs-target="#resetModal">
+                                    <i class="fas fa-redo d-block mb-2" style="font-size: 1.5rem;"></i>
+                                    Reset Votes
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Reset Confirmation Modal -->
+<div class="modal fade" id="resetModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle text-danger me-2"></i>
+                    Reset All Votes
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-3">Are you sure you want to reset all votes? This action will:</p>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-times text-danger me-2"></i>Delete all recorded votes</li>
+                    <li><i class="fas fa-times text-danger me-2"></i>Reset all student voting status</li>
+                    <li><i class="fas fa-times text-danger me-2"></i>Clear all election results</li>
+                </ul>
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Warning:</strong> This action cannot be undone!
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form method="POST" action="{{ url_for('reset_votes') }}" class="d-inline">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i>
+                        Reset All Votes
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

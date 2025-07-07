@@ -64,9 +64,11 @@ def submit_vote():
         flash(voting_status['message'], 'error')
         return redirect(url_for('voting'))
     
-    admission_number = request.form.get('student_id', '').strip()
-    head_boy_candidate_id = request.form.get('head_boy_candidate')
-    head_girl_candidate_id = request.form.get('head_girl_candidate')
+    # Note: Voting prevention is handled by admission number check below
+    
+    admission_number = request.form.get('admission_number', '').strip()
+    head_boy_candidate_id = request.form.get('head_boy_vote')
+    head_girl_candidate_id = request.form.get('head_girl_vote')
     
     # Validate admission number
     if not admission_number:
@@ -92,11 +94,12 @@ def submit_vote():
         return redirect(url_for('voting'))
     
     try:
-        # Create or get student record
+        # Create or get student record - automatically create if doesn't exist
         if not existing_student:
             student = Student(
                 student_id=admission_number,
-                name=admission_number,  # Store actual admission number
+                name=f"Student {admission_number}",  # Default name format
+                class_name="Not Specified",  # Default class
                 has_voted=True
             )
             db.session.add(student)

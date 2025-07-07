@@ -144,10 +144,16 @@
                         <i class="fas fa-home me-2"></i>
                         Back to Home
                     </a>
-                    <a href="{{ url_for('voting') }}" class="btn btn-outline-primary btn-lg px-4">
-                        <i class="fas fa-eye me-2"></i>
-                        View Candidates
-                    </a>
+                    <button type="button" class="btn btn-outline-secondary btn-lg px-4" disabled>
+                        <i class="fas fa-check-circle me-2"></i>
+                        Vote Completed
+                    </button>
+                </div>
+                <div class="text-center mt-3">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Your vote has been recorded. You cannot vote again with the same admission number.
+                    </small>
                 </div>
             </div>
         </div>
@@ -157,24 +163,44 @@
 
 {% block scripts %}
 <script>
-// Auto-redirect after 30 seconds
-setTimeout(function() {
-    window.location.href = "{{ url_for('index') }}";
-}, 30000);
+// Prevent all back navigation
+if (window.history && window.history.pushState) {
+    // Replace current history state
+    window.history.replaceState({}, '', window.location.href);
+    window.history.pushState({}, '', window.location.href);
+    
+    window.addEventListener('popstate', function(event) {
+        // Always redirect to home, preventing back navigation
+        event.preventDefault();
+        window.location.replace("{{ url_for('index') }}");
+    });
+    
+    // Override browser back button
+    window.addEventListener('beforeunload', function(event) {
+        // This helps prevent accidental navigation away
+        return true;
+    });
+}
 
-// Countdown timer
-let countdown = 30;
-const countdownElement = document.createElement('div');
-countdownElement.className = 'text-center mt-3 text-muted';
-countdownElement.innerHTML = '<small><i class="fas fa-clock me-1"></i>Redirecting to home in <span id="countdown">30</span> seconds...</small>';
-document.querySelector('.container').appendChild(countdownElement);
+// Simple success page behavior
+document.addEventListener('DOMContentLoaded', function() {
+    // Add visual feedback
+    setTimeout(function() {
+        const successMessage = document.createElement('div');
+        successMessage.className = 'alert alert-success position-fixed';
+        successMessage.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 300px;';
+        successMessage.innerHTML = '<i class="fas fa-check-circle me-2"></i>Vote recorded successfully!';
+        document.body.appendChild(successMessage);
+        
+        setTimeout(() => successMessage.remove(), 5000);
+    }, 1000);
+});
 
-setInterval(function() {
-    countdown--;
-    document.getElementById('countdown').textContent = countdown;
-    if (countdown <= 0) {
-        countdownElement.innerHTML = '<small><i class="fas fa-spinner fa-spin me-1"></i>Redirecting...</small>';
+// Prevent manual URL navigation to voting page
+window.addEventListener('focus', function() {
+    if (window.location.pathname.includes('/voting')) {
+        window.location.replace("{{ url_for('index') }}");
     }
-}, 1000);
+});
 </script>
 {% endblock %}

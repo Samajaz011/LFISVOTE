@@ -75,8 +75,12 @@
                             <div class="card-body">
                                 <div class="form-group">
                                     <label for="admission_number" class="form-label">Admission Number</label>
-                                    <input type="text" class="form-control" id="admission_number" name="admission_number" 
-                                           required placeholder="Enter your admission number">
+                                    <input type="text" class="form-control form-control-lg" id="admission_number" name="admission_number" 
+                                           required placeholder="Enter your admission number" autocomplete="off">
+                                    <small class="form-text text-muted mt-2">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Any valid admission number can be used - no pre-registration required
+                                    </small>
                                 </div>
                             </div>
                         </div>
@@ -91,11 +95,14 @@
                             </div>
                             <div class="card-body">
                                 <ul class="list-unstyled mb-0">
-                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Enter your admission number</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Enter any valid admission number</li>
                                     <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Select one Head Boy candidate</li>
                                     <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Select one Head Girl candidate</li>
                                     <li class="mb-0"><i class="fas fa-check text-success me-2"></i>Submit your vote</li>
                                 </ul>
+                                <div class="alert alert-warning mt-3 mb-0 p-2">
+                                    <small><i class="fas fa-exclamation-triangle me-1"></i>Each admission number can only vote once!</small>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -258,6 +265,8 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Note: Voting prevention is handled server-side by admission number check
+    
     // Handle candidate card selection
     const candidateCards = document.querySelectorAll('.candidate-card');
     

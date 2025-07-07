@@ -124,6 +124,7 @@ Changelog:
 - July 06, 2025. Fixed candidate editing issues: expanded photo_url field to TEXT, added JavaScript for edit/delete functionality, and added reset vote buttons
 - July 06, 2025. Enhanced countdown timer with visual cards layout, animated transitions, progress ring, milestone notifications, and responsive design
 - July 06, 2025. Added admin voting control system: manual start/stop voting with override capabilities beyond scheduled time restrictions
+- July 07, 2025. Removed time-based voting restrictions and countdown timers - voting is now always open unless manually closed by admin
 ```
 
 ## User Preferences

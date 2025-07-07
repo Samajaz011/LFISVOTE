@@ -35,55 +35,25 @@ def voting():
                          voting_status=voting_status)
 
 def is_voting_active():
-    """Check if voting is currently active based on schedule and admin override"""
-    from datetime import datetime
-    
-    # Check admin override first
+    """Check if voting is currently active based on admin control only"""
+    # Check admin override settings
     voting_session = VotingSession.query.first()
     if voting_session and voting_session.admin_override:
-        if voting_session.override_status == 'force_open':
-            return True
-        elif voting_session.override_status == 'force_closed':
+        if voting_session.override_status == 'force_closed':
             return False
     
-    # Fall back to scheduled time (July 7, 2025, 9:00 AM to 2:00 PM)
-    voting_date = datetime(2025, 7, 7)
-    voting_start = voting_date.replace(hour=9, minute=0, second=0, microsecond=0)
-    voting_end = voting_date.replace(hour=14, minute=0, second=0, microsecond=0)
-    now = datetime.now()
-    
-    return voting_start <= now <= voting_end
+    # Voting is always active unless manually closed by admin
+    return True
 
 def get_voting_status():
-    """Get current voting status and time information"""
-    from datetime import datetime
-    
-    voting_date = datetime(2025, 7, 7)
-    voting_start = voting_date.replace(hour=9, minute=0, second=0, microsecond=0)
-    voting_end = voting_date.replace(hour=14, minute=0, second=0, microsecond=0)
-    now = datetime.now()
-    
-    if now < voting_start:
-        return {
-            'status': 'not_started',
-            'message': 'Voting has not started yet',
-            'target_time': voting_start,
-            'countdown_type': 'start'
-        }
-    elif now > voting_end:
-        return {
-            'status': 'ended',
-            'message': 'Voting has ended',
-            'target_time': voting_end,
-            'countdown_type': 'ended'
-        }
-    else:
-        return {
-            'status': 'active',
-            'message': 'Voting is currently active',
-            'target_time': voting_end,
-            'countdown_type': 'end'
-        }
+    """Get current voting status information"""
+    voting_session = VotingSession.query.first()
+    return {
+        'status': 'active' if is_voting_active() else 'closed',
+        'message': 'Voting is open' if is_voting_active() else 'Voting is closed by admin',
+        'admin_controlled': voting_session and voting_session.admin_override,
+        'override_status': voting_session.override_status if voting_session and voting_session.admin_override else 'open'
+    }
 
 @app.route('/submit_vote', methods=['POST'])
 def submit_vote():
@@ -398,11 +368,24 @@ def add_candidate():
     if 'candidate_photo' in request.files:
         photo_file = request.files['candidate_photo']
         if photo_file and photo_file.filename:
-            # In a real implementation, you would save the file to a storage service
-            # For now, we'll use a placeholder or base64 encoding
-            import base64
-            photo_data = base64.b64encode(photo_file.read()).decode('utf-8')
-            photo_url = f"data:image/{photo_file.filename.split('.')[-1]};base64,{photo_data}"
+            import os
+            import uuid
+            from werkzeug.utils import secure_filename
+            
+            # Create unique filename
+            file_extension = photo_file.filename.rsplit('.', 1)[1].lower() if '.' in photo_file.filename else 'jpg'
+            unique_filename = f"{uuid.uuid4()}_{secure_filename(photo_file.filename)}"
+            
+            # Ensure uploads directory exists
+            upload_dir = os.path.join(app.static_folder, 'uploads', 'candidates')
+            os.makedirs(upload_dir, exist_ok=True)
+            
+            # Save file
+            file_path = os.path.join(upload_dir, unique_filename)
+            photo_file.save(file_path)
+            
+            # Store relative URL for database
+            photo_url = f"/static/uploads/candidates/{unique_filename}"
     
     candidate = Candidate(
         name=name,
@@ -439,10 +422,30 @@ def edit_candidate():
     if 'candidate_photo' in request.files:
         photo_file = request.files['candidate_photo']
         if photo_file and photo_file.filename:
-            # Update photo if new one is uploaded
-            import base64
-            photo_data = base64.b64encode(photo_file.read()).decode('utf-8')
-            candidate.photo_url = f"data:image/{photo_file.filename.split('.')[-1]};base64,{photo_data}"
+            import os
+            import uuid
+            from werkzeug.utils import secure_filename
+            
+            # Delete old photo if it exists and is a file (not base64)
+            if candidate.photo_url and candidate.photo_url.startswith('/static/uploads/'):
+                old_file_path = os.path.join(app.static_folder, candidate.photo_url[8:])  # Remove '/static/' prefix
+                if os.path.exists(old_file_path):
+                    os.remove(old_file_path)
+            
+            # Create unique filename
+            file_extension = photo_file.filename.rsplit('.', 1)[1].lower() if '.' in photo_file.filename else 'jpg'
+            unique_filename = f"{uuid.uuid4()}_{secure_filename(photo_file.filename)}"
+            
+            # Ensure uploads directory exists
+            upload_dir = os.path.join(app.static_folder, 'uploads', 'candidates')
+            os.makedirs(upload_dir, exist_ok=True)
+            
+            # Save file
+            file_path = os.path.join(upload_dir, unique_filename)
+            photo_file.save(file_path)
+            
+            # Store relative URL for database
+            candidate.photo_url = f"/static/uploads/candidates/{unique_filename}"
     
     db.session.commit()
     
@@ -476,6 +479,13 @@ def delete_candidate(candidate_id):
     
     try:
         candidate = Candidate.query.get_or_404(candidate_id)
+        
+        # Delete photo file if it exists and is a file (not base64)
+        if candidate.photo_url and candidate.photo_url.startswith('/static/uploads/'):
+            import os
+            file_path = os.path.join(app.static_folder, candidate.photo_url[8:])  # Remove '/static/' prefix
+            if os.path.exists(file_path):
+                os.remove(file_path)
         
         # Delete associated votes first
         Vote.query.filter_by(candidate_id=candidate_id).delete()
@@ -561,7 +571,7 @@ def voting_control(action):
         elif action == 'reset_schedule':
             voting_session.admin_override = False
             voting_session.override_status = 'scheduled'
-            flash('Voting control returned to scheduled time (July 7, 2025, 9:00 AM - 2:00 PM).', 'info')
+            flash('Voting control returned to default open status.', 'info')
             
         else:
             flash('Invalid action requested.', 'error')

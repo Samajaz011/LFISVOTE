@@ -22,119 +22,21 @@
                             VOTING ACTIVE
                         </span>
                         <div class="text-white">
-                            <div class="text-center mb-3">
-                                <h4 class="fw-bold mb-1">Voting Ends In</h4>
-                                <p class="mb-0 opacity-75">Deadline: July 7, 2025 at 2:00 PM</p>
-                            </div>
-                            
-                            <!-- Countdown Timer Container -->
-                            <div id="countdown-timer" class="countdown-container" data-target="{{ voting_status.target_time.isoformat() }}">
-                                <!-- Countdown Cards -->
-                                <div class="countdown-cards">
-                                    <div class="countdown-card">
-                                        <div class="countdown-number" id="days">00</div>
-                                        <div class="countdown-label">Days</div>
-                                    </div>
-                                    <div class="countdown-separator">:</div>
-                                    <div class="countdown-card">
-                                        <div class="countdown-number" id="hours">00</div>
-                                        <div class="countdown-label">Hours</div>
-                                    </div>
-                                    <div class="countdown-separator">:</div>
-                                    <div class="countdown-card">
-                                        <div class="countdown-number" id="minutes">00</div>
-                                        <div class="countdown-label">Minutes</div>
-                                    </div>
-                                    <div class="countdown-separator">:</div>
-                                    <div class="countdown-card">
-                                        <div class="countdown-number" id="seconds">00</div>
-                                        <div class="countdown-label">Seconds</div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Progress Ring -->
-                                <div class="progress-ring-container mt-3">
-                                    <div class="progress-ring">
-                                        <svg class="progress-ring-svg" width="120" height="120">
-                                            <circle class="progress-ring-background" cx="60" cy="60" r="50" />
-                                            <circle class="progress-ring-progress" cx="60" cy="60" r="50" id="progress-circle" />
-                                        </svg>
-                                        <div class="progress-ring-content">
-                                            <div class="progress-percentage" id="progress-percentage">0%</div>
-                                            <div class="progress-label">Time Left</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Milestone Alerts -->
-                                <div class="milestone-alerts mt-3" id="milestone-alerts">
-                                    <!-- Dynamic milestone notifications will appear here -->
-                                </div>
-                            </div>
-                        </div>
-                    {% elif voting_status.status == 'not_started' %}
-                        <span class="badge bg-warning fs-6 px-3 py-2 mb-3">
-                            <i class="fas fa-clock me-1"></i>
-                            VOTING NOT STARTED
-                        </span>
-                        <div class="text-white">
-                            <div class="text-center mb-3">
-                                <h4 class="fw-bold mb-1">Election Day Countdown</h4>
-                                <p class="mb-0 opacity-75">Voting opens July 7, 2025 at 9:00 AM</p>
-                            </div>
-                            
-                            <!-- Countdown Timer Container -->
-                            <div id="countdown-timer" class="countdown-container" data-target="{{ voting_status.target_time.isoformat() }}">
-                                <!-- Countdown Cards -->
-                                <div class="countdown-cards">
-                                    <div class="countdown-card">
-                                        <div class="countdown-number" id="days">00</div>
-                                        <div class="countdown-label">Days</div>
-                                    </div>
-                                    <div class="countdown-separator">:</div>
-                                    <div class="countdown-card">
-                                        <div class="countdown-number" id="hours">00</div>
-                                        <div class="countdown-label">Hours</div>
-                                    </div>
-                                    <div class="countdown-separator">:</div>
-                                    <div class="countdown-card">
-                                        <div class="countdown-number" id="minutes">00</div>
-                                        <div class="countdown-label">Minutes</div>
-                                    </div>
-                                    <div class="countdown-separator">:</div>
-                                    <div class="countdown-card">
-                                        <div class="countdown-number" id="seconds">00</div>
-                                        <div class="countdown-label">Seconds</div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Progress Ring -->
-                                <div class="progress-ring-container mt-3">
-                                    <div class="progress-ring">
-                                        <svg class="progress-ring-svg" width="120" height="120">
-                                            <circle class="progress-ring-background" cx="60" cy="60" r="50" />
-                                            <circle class="progress-ring-progress" cx="60" cy="60" r="50" id="progress-circle" />
-                                        </svg>
-                                        <div class="progress-ring-content">
-                                            <div class="progress-percentage" id="progress-percentage">0%</div>
-                                            <div class="progress-label">Until Voting</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Milestone Alerts -->
-                                <div class="milestone-alerts mt-3" id="milestone-alerts">
-                                    <!-- Dynamic milestone notifications will appear here -->
-                                </div>
+                            <div class="text-center">
+                                <h4 class="fw-bold mb-1">Voting is Open</h4>
+                                <p class="mb-0 opacity-75">Cast your vote now</p>
                             </div>
                         </div>
                     {% else %}
-                        <span class="badge bg-danger fs-6 px-3 py-2">
-                            <i class="fas fa-times-circle me-1"></i>
-                            VOTING ENDED
+                        <span class="badge bg-warning fs-6 px-3 py-2 mb-3">
+                            <i class="fas fa-clock me-1"></i>
+                            VOTING CLOSED
                         </span>
                         <div class="text-white">
-                            <small>Voting ended at 2:00 PM</small>
+                            <div class="text-center">
+                                <h4 class="fw-bold mb-1">Voting is Closed</h4>
+                                <p class="mb-0 opacity-75">Contact admin for access</p>
+                            </div>
                         </div>
                     {% endif %}
                 </div>
@@ -146,530 +48,263 @@
 <!-- Voting Form -->
 <section class="py-5">
     <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else 'success' if category == 'success' else 'info' }} alert-dismissible fade show" role="alert">
+                        <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' if category == 'success' else 'info-circle' }} me-2"></i>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Voting Form -->
         {% if voting_status.status == 'active' %}
-        <form method="POST" action="{{ url_for('submit_vote') }}" id="votingForm">
-        {% else %}
-        <div class="alert alert-{{ 'warning' if voting_status.status == 'not_started' else 'danger' }} text-center">
-            <h4><i class="fas fa-{{ 'clock' if voting_status.status == 'not_started' else 'times-circle' }} me-2"></i>{{ voting_status.message }}</h4>
-            <p class="mb-0">
-                {% if voting_status.status == 'not_started' %}
-                    Voting will be available from <strong>9:00 AM to 2:00 PM on July 7, 2025</strong>
-                {% else %}
-                    Voting was available from <strong>9:00 AM to 2:00 PM on July 7, 2025</strong>
-                {% endif %}
-            </p>
-        </div>
-        <div style="opacity: 0.5; pointer-events: none;">
-        {% endif %}
-            <!-- Student ID Input -->
-            <div class="row mb-5">
-                <div class="col-lg-6 mx-auto">
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <h3 class="card-title text-primary mb-3">
-                                <i class="fas fa-id-card me-2"></i>
-                                Student Authentication
-                            </h3>
-                            <div class="mb-3">
-                                <input type="text" 
-                                       class="form-control form-control-lg text-center" 
-                                       id="student_id" 
-                                       name="student_id" 
-                                       placeholder="Enter your Admission Number" 
-                                       required>
+            <form method="POST" action="{{ url_for('submit_vote') }}" id="voteForm">
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-light">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-user-tie me-2"></i>
+                                    Your Admission Number
+                                </h5>
                             </div>
-                            <small class="text-muted">
-                                <i class="fas fa-info-circle me-1"></i>
-                                Enter your admission number to proceed with voting
-                            </small>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label for="admission_number" class="form-label">Admission Number</label>
+                                    <input type="text" class="form-control" id="admission_number" name="admission_number" 
+                                           required placeholder="Enter your admission number">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-light">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Voting Instructions
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-unstyled mb-0">
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Enter your admission number</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Select one Head Boy candidate</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Select one Head Girl candidate</li>
+                                    <li class="mb-0"><i class="fas fa-check text-success me-2"></i>Submit your vote</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Head Boy Candidates -->
-            <div class="row mb-5">
-                <div class="col-12">
-                    <h2 class="text-center mb-4">
-                        <i class="fas fa-user-tie text-primary me-2"></i>
+                <!-- Head Boy Candidates -->
+                <div class="mb-5">
+                    <h3 class="mb-4">
+                        <i class="fas fa-male me-2"></i>
                         Head Boy Candidates
-                    </h2>
-                    <div class="row g-4">
+                    </h3>
+                    <div class="row">
                         {% for candidate in head_boy_candidates %}
-                        <div class="col-lg-6">
-                            <div class="candidate-card" data-position="head_boy" data-candidate="{{ candidate.id }}">
-                                <div class="card border-0 shadow-sm h-100">
-                                    <div class="card-body p-4">
-                                        <div class="d-flex align-items-start">
-                                            <div class="candidate-photo me-3">
-                                                {% if candidate.photo_url %}
-                                                    <img src="{{ candidate.photo_url }}" 
-                                                         alt="{{ candidate.name }}" 
-                                                         class="rounded-circle"
-                                                         width="80" height="80">
-                                                {% else %}
-                                                    <div class="placeholder-photo rounded-circle d-flex align-items-center justify-content-center">
-                                                        <i class="fas fa-user text-muted"></i>
-                                                    </div>
-                                                {% endif %}
+                            <div class="col-md-6 col-lg-4 mb-4">
+                                <div class="card candidate-card border-0 shadow-sm h-100" data-candidate-id="{{ candidate.id }}">
+                                    <div class="card-body text-center">
+                                        {% if candidate.photo_url %}
+                                            <img src="{{ candidate.photo_url }}" alt="{{ candidate.name }}" class="candidate-photo mb-3">
+                                        {% else %}
+                                            <div class="candidate-photo-placeholder mb-3">
+                                                <i class="fas fa-user"></i>
                                             </div>
-                                            <div class="candidate-info flex-grow-1">
-                                                <h4 class="card-title fw-bold text-primary mb-1">{{ candidate.name }}</h4>
-                                                <p class="text-muted mb-2">
-                                                    <i class="fas fa-graduation-cap me-1"></i>
-                                                    {{ candidate.class_name }}
-                                                </p>
-                                                {% if candidate.description %}
-                                                <p class="card-text mb-2">{{ candidate.description }}</p>
-                                                {% endif %}
-                                                {% if candidate.achievements %}
-                                                <div class="achievements">
-                                                    <small class="text-success">
-                                                        <i class="fas fa-trophy me-1"></i>
-                                                        {{ candidate.achievements }}
-                                                    </small>
-                                                </div>
-                                                {% endif %}
+                                        {% endif %}
+                                        <h5 class="card-title">{{ candidate.name }}</h5>
+                                        <p class="text-muted mb-2">{{ candidate.class_name }}</p>
+                                        {% if candidate.description %}
+                                            <p class="card-text">{{ candidate.description }}</p>
+                                        {% endif %}
+                                        {% if candidate.achievements %}
+                                            <div class="achievements mb-3">
+                                                <small class="text-muted">{{ candidate.achievements }}</small>
                                             </div>
-                                            <div class="selection-indicator">
-                                                <i class="fas fa-check-circle text-success"></i>
-                                            </div>
+                                        {% endif %}
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="head_boy_vote" 
+                                                   value="{{ candidate.id }}" id="head_boy_{{ candidate.id }}" required>
+                                            <label class="form-check-label" for="head_boy_{{ candidate.id }}">
+                                                Select as Head Boy
+                                            </label>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
                         {% endfor %}
                     </div>
-                    <input type="hidden" name="head_boy_candidate" id="head_boy_candidate" required>
                 </div>
-            </div>
 
-            <!-- Head Girl Candidates -->
-            <div class="row mb-5">
-                <div class="col-12">
-                    <h2 class="text-center mb-4">
-                        <i class="fas fa-female text-success me-2"></i>
+                <!-- Head Girl Candidates -->
+                <div class="mb-5">
+                    <h3 class="mb-4">
+                        <i class="fas fa-female me-2"></i>
                         Head Girl Candidates
-                    </h2>
-                    <div class="row g-4">
+                    </h3>
+                    <div class="row">
                         {% for candidate in head_girl_candidates %}
-                        <div class="col-lg-6">
-                            <div class="candidate-card" data-position="head_girl" data-candidate="{{ candidate.id }}">
-                                <div class="card border-0 shadow-sm h-100">
-                                    <div class="card-body p-4">
-                                        <div class="d-flex align-items-start">
-                                            <div class="candidate-photo me-3">
-                                                {% if candidate.photo_url %}
-                                                    <img src="{{ candidate.photo_url }}" 
-                                                         alt="{{ candidate.name }}" 
-                                                         class="rounded-circle"
-                                                         width="80" height="80">
-                                                {% else %}
-                                                    <div class="placeholder-photo rounded-circle d-flex align-items-center justify-content-center">
-                                                        <i class="fas fa-user text-muted"></i>
-                                                    </div>
-                                                {% endif %}
+                            <div class="col-md-6 col-lg-4 mb-4">
+                                <div class="card candidate-card border-0 shadow-sm h-100" data-candidate-id="{{ candidate.id }}">
+                                    <div class="card-body text-center">
+                                        {% if candidate.photo_url %}
+                                            <img src="{{ candidate.photo_url }}" alt="{{ candidate.name }}" class="candidate-photo mb-3">
+                                        {% else %}
+                                            <div class="candidate-photo-placeholder mb-3">
+                                                <i class="fas fa-user"></i>
                                             </div>
-                                            <div class="candidate-info flex-grow-1">
-                                                <h4 class="card-title fw-bold text-success mb-1">{{ candidate.name }}</h4>
-                                                <p class="text-muted mb-2">
-                                                    <i class="fas fa-graduation-cap me-1"></i>
-                                                    {{ candidate.class_name }}
-                                                </p>
-                                                {% if candidate.description %}
-                                                <p class="card-text mb-2">{{ candidate.description }}</p>
-                                                {% endif %}
-                                                {% if candidate.achievements %}
-                                                <div class="achievements">
-                                                    <small class="text-success">
-                                                        <i class="fas fa-trophy me-1"></i>
-                                                        {{ candidate.achievements }}
-                                                    </small>
-                                                </div>
-                                                {% endif %}
+                                        {% endif %}
+                                        <h5 class="card-title">{{ candidate.name }}</h5>
+                                        <p class="text-muted mb-2">{{ candidate.class_name }}</p>
+                                        {% if candidate.description %}
+                                            <p class="card-text">{{ candidate.description }}</p>
+                                        {% endif %}
+                                        {% if candidate.achievements %}
+                                            <div class="achievements mb-3">
+                                                <small class="text-muted">{{ candidate.achievements }}</small>
                                             </div>
-                                            <div class="selection-indicator">
-                                                <i class="fas fa-check-circle text-success"></i>
-                                            </div>
+                                        {% endif %}
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="head_girl_vote" 
+                                                   value="{{ candidate.id }}" id="head_girl_{{ candidate.id }}" required>
+                                            <label class="form-check-label" for="head_girl_{{ candidate.id }}">
+                                                Select as Head Girl
+                                            </label>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
                         {% endfor %}
                     </div>
-                    <input type="hidden" name="head_girl_candidate" id="head_girl_candidate" required>
                 </div>
-            </div>
 
-            <!-- Submit Button -->
-            <div class="row">
-                <div class="col-lg-6 mx-auto">
-                    <div class="text-center">
-                        <button type="submit" class="btn btn-primary btn-lg px-5 py-3" id="submitVote">
-                            <i class="fas fa-paper-plane me-2"></i>
-                            Submit My Vote
-                        </button>
-                        <div class="mt-3">
-                            <small class="text-muted">
-                                <i class="fas fa-exclamation-triangle me-1"></i>
-                                You can only vote once. Please review your selections carefully.
-                            </small>
-                        </div>
-                    </div>
+                <!-- Submit Button -->
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary btn-lg px-5 py-3" id="submitVote">
+                        <i class="fas fa-vote-yea me-2"></i>
+                        Submit My Vote
+                    </button>
                 </div>
-            </div>
-        {% if voting_status.status == 'active' %}
-        </form>
+            </form>
         {% else %}
-        </div>
+            <div class="text-center py-5">
+                <div class="mb-4">
+                    <i class="fas fa-clock text-muted" style="font-size: 4rem;"></i>
+                </div>
+                <h3 class="text-muted">Voting is Currently Closed</h3>
+                <p class="text-muted">Please contact the administration for voting access.</p>
+            </div>
         {% endif %}
     </div>
 </section>
 
-<!-- Voting Instructions -->
-<section class="py-4 bg-light">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-8 mx-auto">
-                <div class="text-center">
-                    <h4 class="fw-bold text-primary mb-3">How to Vote</h4>
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <div class="instruction-step">
-                                <div class="step-number">1</div>
-                                <p class="mb-0">Enter your Admission Number</p>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="instruction-step">
-                                <div class="step-number">2</div>
-                                <p class="mb-0">Select your candidates</p>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="instruction-step">
-                                <div class="step-number">3</div>
-                                <p class="mb-0">Submit your vote</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-{% endblock %}
+<style>
+.candidate-card {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
 
-{% block scripts %}
+.candidate-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+.candidate-card.selected {
+    border: 2px solid #007bff;
+    background-color: #f8f9ff;
+}
+
+.candidate-photo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #dee2e6;
+}
+
+.candidate-photo-placeholder {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    border: 3px solid #dee2e6;
+    color: #6c757d;
+    font-size: 2rem;
+}
+
+.form-check-input:checked ~ .form-check-label {
+    font-weight: bold;
+    color: #007bff;
+}
+
+.achievements {
+    font-size: 0.9rem;
+    background-color: #f8f9fa;
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+}
+</style>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize countdown timer first (always present)
-    initializeCountdown();
-    
-    // Only initialize voting form functionality if voting is active
-    const form = document.getElementById('votingForm');
-    if (form) {
-        initializeVotingForm();
-    }
-});
-
-function initializeVotingForm() {
+    // Handle candidate card selection
     const candidateCards = document.querySelectorAll('.candidate-card');
-    const form = document.getElementById('votingForm');
-    const submitBtn = document.getElementById('submitVote');
     
-    if (!form || !submitBtn) return;
-    
-    // Handle candidate selection
     candidateCards.forEach(card => {
         card.addEventListener('click', function() {
-            const position = this.dataset.position;
-            const candidateId = this.dataset.candidate;
-            
-            // Remove selection from other cards of the same position
-            document.querySelectorAll(`.candidate-card[data-position="${position}"]`).forEach(c => {
-                c.classList.remove('selected');
-            });
-            
-            // Add selection to this card
-            this.classList.add('selected');
-            
-            // Update hidden input
-            document.getElementById(`${position}_candidate`).value = candidateId;
-            
-            // Check if both positions are selected
-            checkFormCompletion();
+            const radio = this.querySelector('input[type="radio"]');
+            if (radio) {
+                radio.checked = true;
+                
+                // Remove selected class from other cards in the same group
+                const groupName = radio.name;
+                const otherCards = document.querySelectorAll(`input[name="${groupName}"]`);
+                otherCards.forEach(otherRadio => {
+                    otherRadio.closest('.candidate-card').classList.remove('selected');
+                });
+                
+                // Add selected class to this card
+                this.classList.add('selected');
+            }
         });
     });
     
-    // Check form completion
-    function checkFormCompletion() {
-        const studentId = document.getElementById('student_id');
-        const headBoySelected = document.getElementById('head_boy_candidate');
-        const headGirlSelected = document.getElementById('head_girl_candidate');
-        
-        if (!studentId || !headBoySelected || !headGirlSelected) return;
-        
-        if (studentId.value && headBoySelected.value && headGirlSelected.value) {
-            submitBtn.disabled = false;
-            submitBtn.classList.add('btn-success');
-            submitBtn.classList.remove('btn-primary');
-        } else {
-            submitBtn.disabled = true;
-            submitBtn.classList.add('btn-primary');
-            submitBtn.classList.remove('btn-success');
-        }
-    }
-    
-    // Monitor student ID input
-    const studentIdInput = document.getElementById('student_id');
-    if (studentIdInput) {
-        studentIdInput.addEventListener('input', checkFormCompletion);
-    }
-    
-    // Form submission
-    form.addEventListener('submit', function(e) {
-        const studentId = document.getElementById('student_id');
-        const headBoySelected = document.getElementById('head_boy_candidate');
-        const headGirlSelected = document.getElementById('head_girl_candidate');
-        
-        if (!studentId || !headBoySelected || !headGirlSelected || 
-            !studentId.value || !headBoySelected.value || !headGirlSelected.value) {
-            e.preventDefault();
-            alert('Please complete all required fields before submitting your vote.');
-            return;
-        }
-        
-        // Show loading state
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Submitting...';
-        submitBtn.disabled = true;
-    });
-    
-    // Initial check
-    checkFormCompletion();
-}
-
-// Enhanced Election Day Countdown Timer
-function initializeCountdown() {
-    console.log('Initializing countdown timer...');
-    
-    const countdownTimer = document.getElementById('countdown-timer');
-    
-    if (!countdownTimer) {
-        console.log('Countdown timer not found - this is normal when voting is ended');
-        return;
-    }
-    
-    const targetTimeStr = countdownTimer.dataset.target;
-    console.log('Target time string:', targetTimeStr);
-    
-    const targetTime = new Date(targetTimeStr);
-    console.log('Parsed target time:', targetTime);
-    
-    if (isNaN(targetTime.getTime())) {
-        console.error('Invalid target time:', targetTimeStr);
-        return;
-    }
-    
-    // Get countdown elements
-    const elements = {
-        days: document.getElementById('days'),
-        hours: document.getElementById('hours'),
-        minutes: document.getElementById('minutes'),
-        seconds: document.getElementById('seconds'),
-        progressCircle: document.getElementById('progress-circle'),
-        progressPercentage: document.getElementById('progress-percentage'),
-        milestoneAlerts: document.getElementById('milestone-alerts')
-    };
-    
-    console.log('Elements found:', {
-        days: !!elements.days,
-        hours: !!elements.hours,
-        minutes: !!elements.minutes,
-        seconds: !!elements.seconds,
-        progressCircle: !!elements.progressCircle,
-        progressPercentage: !!elements.progressPercentage,
-        milestoneAlerts: !!elements.milestoneAlerts
-    });
-    
-    // Check if elements exist (for when voting is active/ended)
-    if (!elements.days) {
-        console.log('Countdown elements not found - voting may be ended or inactive');
-        return;
-    }
-    
-    // Calculate total duration for progress calculation
-    const startTime = new Date();
-    const totalDuration = targetTime - startTime;
-    
-    // Store previous values for animation detection
-    let previousValues = { days: -1, hours: -1, minutes: -1, seconds: -1 };
-    let lastMilestone = null;
-    
-    // Determine if this is countdown to start or end based on page context
-    const isVotingActive = document.querySelector('.badge.bg-success') !== null;
-    
-    // Milestone thresholds (in milliseconds)
-    const milestones = isVotingActive ? [
-        { threshold: 3 * 60 * 60 * 1000, message: "⏰ Voting ends in 3 hours! Cast your vote now.", urgent: false },
-        { threshold: 2 * 60 * 60 * 1000, message: "📢 Voting ends in 2 hours! Don't miss out.", urgent: false },
-        { threshold: 1 * 60 * 60 * 1000, message: "🔥 Last hour to vote! Make your choice count.", urgent: true },
-        { threshold: 30 * 60 * 1000, message: "🚨 Final 30 minutes! Vote now!", urgent: true },
-        { threshold: 15 * 60 * 1000, message: "⏱️ Only 15 minutes left to vote!", urgent: true },
-        { threshold: 10 * 60 * 1000, message: "⚠️ Final 10 minutes! Cast your vote!", urgent: true },
-        { threshold: 5 * 60 * 1000, message: "🏃‍♂️ Last 5 minutes! Vote immediately!", urgent: true },
-        { threshold: 1 * 60 * 1000, message: "🎊 Final minute! Vote now or miss out!", urgent: true }
-    ] : [
-        { threshold: 24 * 60 * 60 * 1000, message: "🗳️ Election starts in 24 hours!", urgent: false },
-        { threshold: 12 * 60 * 60 * 1000, message: "⏰ Election starts in 12 hours!", urgent: false },
-        { threshold: 6 * 60 * 60 * 1000, message: "🎯 Election starts in 6 hours!", urgent: false },
-        { threshold: 3 * 60 * 60 * 1000, message: "⚡ Election starts in 3 hours!", urgent: false },
-        { threshold: 1 * 60 * 60 * 1000, message: "🔥 Election starts in 1 hour!", urgent: true },
-        { threshold: 30 * 60 * 1000, message: "🚨 Election starts in 30 minutes!", urgent: true },
-        { threshold: 10 * 60 * 1000, message: "⏱️ Election starts in 10 minutes!", urgent: true },
-        { threshold: 5 * 60 * 1000, message: "🏃‍♂️ Election starts in 5 minutes!", urgent: true },
-        { threshold: 1 * 60 * 1000, message: "🎊 Election starts in 1 minute!", urgent: true }
-    ];
-    
-    function updateCountdown() {
-        const now = new Date();
-        const difference = targetTime - now;
-        
-        if (difference <= 0) {
-            showFinalMessage();
-            return;
-        }
-        
-        // Calculate time units
-        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((difference % (1000 * 60)) / 1000);
-        
-        // Update display with animations
-        updateNumberWithAnimation(elements.days, days, previousValues.days);
-        updateNumberWithAnimation(elements.hours, hours, previousValues.hours);
-        updateNumberWithAnimation(elements.minutes, minutes, previousValues.minutes);
-        updateNumberWithAnimation(elements.seconds, seconds, previousValues.seconds);
-        
-        // Update progress ring
-        updateProgressRing(difference, totalDuration);
-        
-        // Check for milestones
-        checkMilestones(difference);
-        
-        // Store current values for next comparison
-        previousValues = { days, hours, minutes, seconds };
-    }
-    
-    function updateNumberWithAnimation(element, newValue, oldValue) {
-        const formattedValue = newValue.toString().padStart(2, '0');
-        
-        if (newValue !== oldValue) {
-            // Add animation class
-            element.classList.add('animate');
+    // Form validation
+    const form = document.getElementById('voteForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const admissionNumber = document.getElementById('admission_number').value;
+            const headBoyVote = document.querySelector('input[name="head_boy_vote"]:checked');
+            const headGirlVote = document.querySelector('input[name="head_girl_vote"]:checked');
             
-            // Update value
-            element.textContent = formattedValue;
-            
-            // Remove animation class after animation completes
-            setTimeout(() => {
-                element.classList.remove('animate');
-            }, 600);
-        } else if (element.textContent !== formattedValue) {
-            element.textContent = formattedValue;
-        }
-    }
-    
-    function updateProgressRing(timeRemaining, totalTime) {
-        if (!elements.progressCircle || !elements.progressPercentage) return;
-        
-        // Avoid division by zero
-        if (totalTime <= 0) return;
-        
-        const progress = Math.max(0, Math.min(1, (totalTime - timeRemaining) / totalTime));
-        const circumference = 314; // 2 * PI * 50 (radius)
-        const offset = circumference - (progress * circumference);
-        
-        elements.progressCircle.style.strokeDashoffset = offset;
-        elements.progressPercentage.textContent = Math.round(progress * 100) + '%';
-    }
-    
-    function checkMilestones(timeRemaining) {
-        for (const milestone of milestones) {
-            if (timeRemaining <= milestone.threshold && lastMilestone !== milestone.threshold) {
-                showMilestoneAlert(milestone.message, milestone.urgent);
-                lastMilestone = milestone.threshold;
-                break;
+            if (!admissionNumber.trim()) {
+                e.preventDefault();
+                alert('Please enter your admission number');
+                return;
             }
-        }
-    }
-    
-    function showMilestoneAlert(message, urgent = false) {
-        if (!elements.milestoneAlerts) return;
-        
-        const alertDiv = document.createElement('div');
-        alertDiv.className = `milestone-alert ${urgent ? 'urgent' : ''}`;
-        alertDiv.innerHTML = `<i class="fas fa-bell me-2"></i>${message}`;
-        
-        elements.milestoneAlerts.appendChild(alertDiv);
-        
-        // Remove alert after 10 seconds
-        setTimeout(() => {
-            if (alertDiv.parentNode) {
-                alertDiv.style.opacity = '0';
-                alertDiv.style.transform = 'translateY(-20px)';
-                setTimeout(() => {
-                    alertDiv.remove();
-                }, 300);
-            }
-        }, 10000);
-        
-        // Keep only last 3 alerts
-        const alerts = elements.milestoneAlerts.children;
-        while (alerts.length > 3) {
-            alerts[0].remove();
-        }
-    }
-    
-    function showFinalMessage() {
-        if (!elements.milestoneAlerts) return;
-        
-        const message = isVotingActive 
-            ? "⏰ Voting has ended! Thank you for participating."
-            : "🎉 Voting is now open! Refreshing page...";
             
-        elements.milestoneAlerts.innerHTML = `
-            <div class="milestone-alert urgent">
-                <i class="fas fa-rocket me-2"></i>
-                ${message}
-            </div>
-        `;
-        
-        // Refresh page after 3 seconds
-        setTimeout(() => {
-            location.reload();
-        }, 3000);
+            if (!headBoyVote || !headGirlVote) {
+                e.preventDefault();
+                alert('Please select both Head Boy and Head Girl candidates');
+                return;
+            }
+            
+            if (!confirm('Are you sure you want to submit your vote? This action cannot be undone.')) {
+                e.preventDefault();
+            }
+        });
     }
-    
-    // Initialize and start the countdown
-    updateCountdown();
-    const interval = setInterval(updateCountdown, 1000);
-    
-    // Store interval reference for cleanup
-    countdownTimer.countdownInterval = interval;
-    
-    // Add initial welcome message
-    setTimeout(() => {
-        if (elements.milestoneAlerts.children.length === 0) {
-            const welcomeMessage = isVotingActive 
-                ? "📊 Voting is live! Don't forget to cast your vote before time runs out."
-                : "🗳️ Get ready for the School Election! Voting opens July 7, 2025 at 9:00 AM";
-            showMilestoneAlert(welcomeMessage, false);
-        }
-    }, 1000);
-}
+});
 </script>
 {% endblock %}
